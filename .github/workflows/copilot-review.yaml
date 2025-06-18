@@ -15,13 +15,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # GitHub-hosted runners already have the GH CLI; we just need auth.
-      - name: Authenticate gh CLI
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "$GH_TOKEN" | gh auth login --with-token
-
       - name: Install gh-copilot-review extension
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
