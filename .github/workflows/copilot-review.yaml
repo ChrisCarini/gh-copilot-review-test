@@ -1,0 +1,34 @@
+name: Copilot Code Review
+
+# Fire only when a PR is created *and* it’s not a draft, or when a
+# draft PR is published (ready_for_review).
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+permissions:
+  pull-requests: write   # needed so the extension can add Copilot as a reviewer
+
+jobs:
+  ask-copilot:
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # GitHub-hosted runners already have the GH CLI; we just need auth.
+      - name: Authenticate gh CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GH_TOKEN" | gh auth login --with-token
+
+      - name: Install gh-copilot-review extension
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh extension install ChrisCarini/gh-copilot-review
+
+      - name: Ask Copilot to review this PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh copilot-review "${{ github.event.pull_request.html_url }}"
